@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'src.miet_angebot',
 ]
 
@@ -75,6 +76,11 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 LANGUAGE_CODE = 'en-us'
 
@@ -87,3 +93,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DATE_INPUT_FORMATS = ["%d.%m.%Y", "%Y.%m.%d", "%Y-%m-%d"]
+DATETIME_INPUT_FORMATS = ["%d.%m.%Y %H:%M:%S", "%Y.%m.%d", "%Y-%m-%d"]
