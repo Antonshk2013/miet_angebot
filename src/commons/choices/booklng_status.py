@@ -5,3 +5,4 @@ class BookingStatusChoice(BaseChoice):
     updated = "updated"
     declined = "declined"
     canceled = "canceled"
+    accepted = "accepted"
