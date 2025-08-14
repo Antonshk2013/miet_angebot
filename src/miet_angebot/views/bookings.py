@@ -7,7 +7,7 @@ from src.miet_angebot.models import Booking
 from src.miet_angebot.serializers import (
     ListBookingSerializer,
     RetrieveBookingSerializer,
-    CreateUpdateSerializer
+    CreateUpdateBookingSerializer
 )
 from src.miet_angebot.permissions import (
     IsAuthor,
@@ -44,7 +44,7 @@ class BookingViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
-              return CreateUpdateSerializer
+              return CreateUpdateBookingSerializer
         elif self.action in ['retrieve']:
             return RetrieveBookingSerializer
         elif self.action in ['list']:
