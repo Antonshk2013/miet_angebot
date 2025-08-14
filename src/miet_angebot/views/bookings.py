@@ -22,13 +22,14 @@ class BookingViewSet(ModelViewSet):
     queryset = Booking.objects.all()
     http_method_names = ["get", "post", "patch"]
 
-    #TODO
-    #Должен еще сделать признак на юзере для упрощения набора queryset
-    #Или решить делать или нет
-
     def get_queryset(self):
-        queryset = Booking.objects.all()
-        return queryset
+        if self.request.user.groups.filter(name="host").exists():
+            return self.queryset.select_related("listing").filter(listing__author=self.request.user)
+            # return self.queryset.filter(listing__author=self.request.user)
+        elif self.request.user.groups.filter(name="guest").exists():
+            return self.queryset.filter(author=self.request.user)
+        else:
+            return self.queryset.none()
 
     def get_permissions(self):
         if self.action == "list":
@@ -102,8 +103,3 @@ class BookingViewSet(ModelViewSet):
             return Response({"detail": "Booking does not exist."}, 404)
         except Exception as e:
             return Response({"detail": str(e)}, 500)
-
-
-
-
-
