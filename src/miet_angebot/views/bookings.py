@@ -9,6 +9,12 @@ from src.miet_angebot.serializers import (
     RetrieveBookingSerializer,
     CreateUpdateSerializer
 )
+from src.miet_angebot.permissions import (
+    IsAuthor,
+    IsListingAuthor,
+    CustomActionsPermission,
+
+)
 from src.commons.choices import BookingStatusChoice
 
 
@@ -16,12 +22,23 @@ class BookingViewSet(ModelViewSet):
     queryset = Booking.objects.all()
     http_method_names = ["get", "post", "patch"]
 
+    #TODO
+    #Должен еще сделать признак на юзере для упрощения набора queryset
+    #Или решить делать или нет
+
     def get_queryset(self):
         queryset = Booking.objects.all()
         return queryset
 
     def get_permissions(self):
-        permissions = [IsAuthenticated(), DjangoModelPermissions()]
+        if self.action == "list":
+            permissions = [IsAuthenticated(), DjangoModelPermissions()]
+        elif self.action in ['create', 'update', 'partial_update']:
+            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor]
+        elif self.action in ['cancel']:
+            permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
+        elif self.action in ['decline', 'accept']:
+            permissions = [IsAuthenticated(), IsListingAuthor(), CustomActionsPermission()]
         return permissions
 
     def get_serializer_class(self):
@@ -31,7 +48,7 @@ class BookingViewSet(ModelViewSet):
             return RetrieveBookingSerializer
         elif self.action in ['list']:
             return ListBookingSerializer
-        return ListPostBookingSerializer
+        return ListBookingSerializer
 
     def perform_create(self, serializer):
         serializer.save(

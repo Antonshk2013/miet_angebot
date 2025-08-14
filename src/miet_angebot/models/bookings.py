@@ -31,5 +31,12 @@ class Booking(models.Model):
         null=True,
     )
 
+    class Meta:
+        permissions = [
+            ("can_decline_booking", "Can decline booking"),
+            ("can_cancel_booking", "Can cansel booking"),
+            ("can_accept_booking", "Can accept booking"),
+        ]
+
     def __str__(self):
         return f"{self.id} {self.date_start} {self.date_end}"
