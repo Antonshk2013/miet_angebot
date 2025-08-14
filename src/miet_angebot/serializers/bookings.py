@@ -13,6 +13,7 @@ class BookingSerializer(serializers.ModelSerializer):
             'date_start',
             'date_end',
             'author',
+            'status',
         ]
 
     def get_listing_title(self, obj):

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 from src.miet_angebot.models.listings import Listing
+from src.commons.choices import BookingStatusChoice
 
 user_model = get_user_model()
 
@@ -23,6 +24,11 @@ class Booking(models.Model):
     )
     updated_at = models.DateTimeField(
         auto_now=True
+    )
+    status = models.CharField(
+        max_length=100,
+        choices=BookingStatusChoice.choices,
+        null=True,
     )
 
     def __str__(self):
