@@ -1,32 +1,86 @@
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from src.miet_angebot.models import Booking
 from src.miet_angebot.serializers import BookingSerializer
+from src.commons.choices import BookingStatusChoice
 
 
 class BookingViewSet(ModelViewSet):
     queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
-    http_method_names = ["get", "post", "put", "patch"]
+    http_method_names = ["get", "post", "patch"]
 
-    # `create()`
-    # `retrieve()`
-    # `update()`
-    # `partial_update()`
-    # `destroy()`
-    # `list()`
+    def get_queryset(self):
+        queryset = Booking.objects.all()
+        return queryset
+
+    def get_permissions(self):
+        permissions = [IsAuthenticated(), DjangoModelPermissions()]
+        return permissions
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'retrieve', 'update', 'partial_update']:
+              return BookingSerializer
+        elif self.action in ['list']:
+            return BookingSerializer
+        return BookingSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save(
+            author=self.request.user,
+            status=BookingStatusChoice.created.value,)
 
-    #TODO
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     ...
+    @action(url_path="canceled", detail=True, methods=["patch"])
+    def cancel(self, request, pk=None):
+        try:
+            booking = self.get_object()
+            serializer = self.get_serializer(
+                instance=booking,
+                data={'status': BookingStatusChoice.canceled.value},
+                partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"detail": "Booking cancelled successfully."})
+        except Booking.DoesNotExist:
+            return Response({"detail": "Booking does not exist."}, 404)
+        except Exception as e:
+            return Response({"detail": str(e)}, 500)
 
-    #TODO
-    # def get_permissions(self):
-    #     ...
+    @action(url_path="declined", detail=True, methods=["patch"])
+    def decline(self, request, pk=None):
+        try:
+            booking = self.get_object()
+            serializer = self.get_serializer(
+                instance=booking,
+                data={'status': BookingStatusChoice.declined.value},
+                partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"detail": "Booking declined successfully."})
+        except Booking.DoesNotExist:
+            return Response({"detail": "Booking does not exist."}, 404)
+        except Exception as e:
+            return Response({"detail": str(e)}, 500)
+
+    @action(url_path="accepted", detail=True, methods=["patch"])
+    def accept(self, request, pk=None):
+        try:
+            booking = self.get_object()
+            serializer = self.get_serializer(
+                instance=booking,
+                data={'status': BookingStatusChoice.accepted.value},
+                partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"detail": "Booking accepted successfully."})
+        except Booking.DoesNotExist:
+            return Response({"detail": "Booking does not exist."}, 404)
+        except Exception as e:
+            return Response({"detail": str(e)}, 500)
+
+
 
 
 
