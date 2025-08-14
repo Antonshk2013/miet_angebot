@@ -1,20 +1,38 @@
 from rest_framework import serializers
 
 from src.miet_angebot.models import Booking
+from src.miet_angebot.serializers.listings import ListingSerializer
 
 
-class BookingSerializer(serializers.ModelSerializer):
-    listing_title = serializers.SerializerMethodField()
+class ListBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
             'id',
-            'listing_title',
+            'listing',
             'date_start',
             'date_end',
-            'author',
             'status',
         ]
 
-    def get_listing_title(self, obj):
-        return obj.listing.title
+class RetrieveBookingSerializer(serializers.ModelSerializer):
+    listing = ListingSerializer()
+    class Meta:
+        model = Booking
+        fields = [
+            'id',
+            'listing',
+            'date_start',
+            'date_end',
+            'status',
+        ]
+
+class CreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = [
+            'listing',
+            'date_start',
+            'date_end',
+            'status',
+        ]

@@ -4,7 +4,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from src.miet_angebot.models import Booking
-from src.miet_angebot.serializers import BookingSerializer
+from src.miet_angebot.serializers import (
+    ListBookingSerializer,
+    RetrieveBookingSerializer,
+    CreateUpdateSerializer
+)
 from src.commons.choices import BookingStatusChoice
 
 
@@ -21,11 +25,13 @@ class BookingViewSet(ModelViewSet):
         return permissions
 
     def get_serializer_class(self):
-        if self.action in ['create', 'retrieve', 'update', 'partial_update']:
-              return BookingSerializer
+        if self.action in ['create', 'update', 'partial_update']:
+              return CreateUpdateSerializer
+        elif self.action in ['retrieve']:
+            return RetrieveBookingSerializer
         elif self.action in ['list']:
-            return BookingSerializer
-        return BookingSerializer
+            return ListBookingSerializer
+        return ListPostBookingSerializer
 
     def perform_create(self, serializer):
         serializer.save(
