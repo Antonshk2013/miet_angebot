@@ -7,6 +7,7 @@ class GuestListListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
+            'id',
             'title',
             'short_description',
             'location',
@@ -32,6 +33,7 @@ class HostListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
+            'id',
             'title',
             'description',
             'location',
@@ -60,7 +62,6 @@ class ListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
-            'id',
             'title',
             'description',
             'location',

@@ -7,12 +7,6 @@ class CountRumsChoice(BaseChoice):
     three_rums = 'three_rums'
     gte_four_rums = 'four und mer'
 
-    int_map = {
-        1: one_rums,
-        2: two_rums,
-        3: three_rums,
-        4: gte_four_rums,
-    }
 
     @classmethod
     def get_imap(cls):
@@ -36,3 +30,4 @@ class CountRumsChoice(BaseChoice):
                and (max_value is None or k <= max_value)
         ]
         return result
+

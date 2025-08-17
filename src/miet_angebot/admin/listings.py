@@ -20,6 +20,7 @@ class ListingsAdmin(admin.ModelAdmin):
         "rooms_count",
         "apartment_type",
         "cancellation_policy",
+        "author",
     )
     search_fields = (
         "title",
