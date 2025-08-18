@@ -71,18 +71,13 @@ class ListingViewSet(ModelViewSet):
         if self.user_group == "host":
             if self.action in ["list"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
-                return permissions
             elif self.action in ['create', 'retrieve', 'update', 'partial_update']:
                 permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-                return permissions
             elif self.action in ['destroy']:
                 permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-                return permissions
         if self.user_group == "guest":
-
             if self.action in ["list", "retrieve"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
-                return permissions
         return permissions
 
 

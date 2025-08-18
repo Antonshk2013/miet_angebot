@@ -12,36 +12,39 @@ from src.miet_angebot.serializers import (
 from src.miet_angebot.permissions import (
     IsAuthor,
     IsListingAuthor,
-    CustomActionsPermission,
+    CustomActionsPermission, DistrictAll,
 
 )
 from src.commons.choices import BookingStatusChoice
 
 
 class BookingViewSet(ModelViewSet):
-    queryset = Booking.objects.all()
     http_method_names = ["get", "post", "patch"]
+    user_group = None
+
+    def initial(self, request, *args, **kwargs):
+        if request.user.groups.filter(name="host").exists():
+            self.user_group = "host"
+        elif request.user.groups.filter(name="guest").exists():
+            self.user_group = "guest"
+        else:
+            self.user_group = None
+        super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
-        if self.request.user.groups.filter(name="host").exists():
-            return self.queryset.select_related("listing").filter(listing__author=self.request.user)
-            # return self.queryset.filter(listing__author=self.request.user)
-        elif self.request.user.groups.filter(name="guest").exists():
-            return self.queryset.filter(author=self.request.user)
+        queryset = Booking.objects.all()
+        if self.user_group=="host":
+            queryset = queryset.select_related("listing").filter(listing__author=self.request.user)
+        elif self.user_group=="guest":
+            queryset = queryset.filter(author=self.request.user)
         else:
-            return self.queryset.none()
+            queryset = queryset.none()
+        return queryset
 
-    def get_permissions(self):
-        if self.action == "list":
-            print(self.request.user)
-            permissions = [IsAuthenticated(), DjangoModelPermissions()]
-        elif self.action in ['create', 'update', 'partial_update']:
-            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor()]
-        elif self.action in ['cancel']:
-            permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
-        elif self.action in ['decline', 'accept']:
-            permissions = [IsAuthenticated(), IsListingAuthor(), CustomActionsPermission()]
-        return permissions
+    def perform_create(self, serializer):
+        serializer.save(
+            author=self.request.user,
+            status=BookingStatusChoice.created.value,)
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -52,10 +55,23 @@ class BookingViewSet(ModelViewSet):
             return ListBookingSerializer
         return ListBookingSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            status=BookingStatusChoice.created.value,)
+
+    def get_permissions(self):
+        permissions = [
+            DistrictAll()
+        ]
+        if self.action == "list":
+            permissions = [IsAuthenticated(), DjangoModelPermissions()]
+        elif self.action in ['create', 'update', 'partial_update']:
+            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor()]
+        elif self.action in ['cancel']:
+            permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
+        elif self.action in ['decline', 'accept']:
+            permissions = [IsAuthenticated(), IsListingAuthor(), CustomActionsPermission()]
+        return permissions
+
+
+
 
     @action(url_path="canceled", detail=True, methods=["patch"])
     def cancel(self, request, pk=None):
