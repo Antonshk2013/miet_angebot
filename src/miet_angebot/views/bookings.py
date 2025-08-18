@@ -16,20 +16,11 @@ from src.miet_angebot.permissions import (
 
 )
 from src.commons.choices import BookingStatusChoice
+from src.commons.mixins import UserGroupMixin
 
 
-class BookingViewSet(ModelViewSet):
+class BookingViewSet(UserGroupMixin, ModelViewSet):
     http_method_names = ["get", "post", "patch"]
-    user_group = None
-
-    def initial(self, request, *args, **kwargs):
-        if request.user.groups.filter(name="host").exists():
-            self.user_group = "host"
-        elif request.user.groups.filter(name="guest").exists():
-            self.user_group = "guest"
-        else:
-            self.user_group = None
-        super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Booking.objects.all()
@@ -55,7 +46,6 @@ class BookingViewSet(ModelViewSet):
             return ListBookingSerializer
         return ListBookingSerializer
 
-
     def get_permissions(self):
         permissions = [
             DistrictAll()
@@ -69,9 +59,6 @@ class BookingViewSet(ModelViewSet):
         elif self.action in ['decline', 'accept']:
             permissions = [IsAuthenticated(), IsListingAuthor(), CustomActionsPermission()]
         return permissions
-
-
-
 
     @action(url_path="canceled", detail=True, methods=["patch"])
     def cancel(self, request, pk=None):
