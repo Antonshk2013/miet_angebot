@@ -37,6 +37,7 @@ class Booking(models.Model):
             ("can_cancel_booking", "Can cansel booking"),
             ("can_accept_booking", "Can accept booking"),
         ]
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.id} {self.date_start} {self.date_end}"
