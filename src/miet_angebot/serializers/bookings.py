@@ -1,3 +1,5 @@
+from django.db.models import Q
+from django.urls import include
 from django.utils import timezone
 
 from rest_framework import serializers
@@ -65,14 +67,23 @@ class CreateUpdateBookingSerializer(serializers.ModelSerializer):
                 {"date_end": "End date must be after start date."}
             )
         listing = data.get("listing")
-        if Booking.objects.select_related("listing").filter(
+
+        include_statuses = [
+            BookingStatusChoice.created.value,
+            BookingStatusChoice.accepted.value
+        ]
+        exclude_statuses = [
+            BookingStatusChoice.declined.value,
+            BookingStatusChoice.canceled.value
+        ]
+        bookings = Booking.objects.filter(
             listing=listing,
-            date_start__gte=date_start,
-            date_end__lte=date_end,
-            status__in=(
-                    BookingStatusChoice.created.value,
-                    BookingStatusChoice.accepted.value,
-            )
-        ).exists():
+            status__in=include_statuses
+        ).filter(
+            Q(date_start__lte=date_start) & Q(date_end__gte=date_end)
+        ).exclude(
+            status__in=exclude_statuses
+        )
+        if bookings.exists():
             raise serializers.ValidationError("Listing is already exists.")
         return data

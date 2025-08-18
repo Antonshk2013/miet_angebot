@@ -12,7 +12,7 @@ from src.miet_angebot.serializers import (
 from src.miet_angebot.permissions import (
     IsAuthor,
     IsListingAuthor,
-    CustomActionsPermission, DistrictAll,
+    CustomActionsPermission, DistrictAll, CustomModelPermissions,
 
 )
 from src.commons.choices import BookingStatusChoice
@@ -51,9 +51,9 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             DistrictAll()
         ]
         if self.action == "list":
-            permissions = [IsAuthenticated(), DjangoModelPermissions()]
+            permissions = [IsAuthenticated(), CustomModelPermissions()]
         elif self.action in ['create', 'update', 'partial_update']:
-            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor()]
+            permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
         elif self.action in ['cancel']:
             permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
         elif self.action in ['decline', 'accept']:
