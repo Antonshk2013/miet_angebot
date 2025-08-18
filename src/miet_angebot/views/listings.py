@@ -15,23 +15,14 @@ from src.miet_angebot.serializers import (
     HostRetrieveListingSerializer,
     ListingSerializer,
 )
+from src.commons.mixins import UserGroupMixin
 
 
-class ListingViewSet(ModelViewSet):
+class ListingViewSet(UserGroupMixin, ModelViewSet):
     filterset_class = ListingFilter
     search_fields = ["title", "description"]
     ordering_fields = ["price_per_day", "created_at"]
     http_method_names = ["get", "post", "put", "patch", "delete"]
-    user_group = None
-
-    def initial(self, request, *args, **kwargs):
-        if request.user.groups.filter(name="host").exists():
-            self.user_group = "host"
-        elif request.user.groups.filter(name="guest").exists():
-            self.user_group = "guest"
-        else:
-            self.user_group = None
-        super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = Listing.objects.filter()
@@ -71,19 +62,11 @@ class ListingViewSet(ModelViewSet):
         if self.user_group == "host":
             if self.action in ["list"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
-                return permissions
             elif self.action in ['create', 'retrieve', 'update', 'partial_update']:
                 permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-                return permissions
             elif self.action in ['destroy']:
                 permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-                return permissions
         if self.user_group == "guest":
-
             if self.action in ["list", "retrieve"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
-                return permissions
         return permissions
-
-
-
