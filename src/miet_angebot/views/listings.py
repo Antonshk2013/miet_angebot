@@ -1,4 +1,4 @@
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 
 from src.miet_angebot.filters import ListingFilter
@@ -6,6 +6,7 @@ from src.miet_angebot.models import Listing
 from src.miet_angebot.permissions import (
     IsAuthor,
     CustomModelPermissions,
+    DistrictAll
 )
 from src.miet_angebot.serializers import (
     GuestListListingSerializer,
@@ -17,31 +18,30 @@ from src.miet_angebot.serializers import (
 
 
 class ListingViewSet(ModelViewSet):
-    queryset = Listing.objects.all()
     filterset_class = ListingFilter
     search_fields = ["title", "description"]
     ordering_fields = ["price_per_day", "created_at"]
-    http_method_names = ["get", "post", "patch", "put", "delete"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     user_group = None
 
-
     def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
         if request.user.groups.filter(name="host").exists():
             self.user_group = "host"
         elif request.user.groups.filter(name="guest").exists():
             self.user_group = "guest"
         else:
             self.user_group = None
+        super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
+        queryset = Listing.objects.filter()
         if self.user_group=="host":
-            print(self.request.build_absolute_uri())
-            return self.queryset.filter(author=self.request.user)
+            queryset = queryset.filter(author=self.request.user)
         elif self.user_group=="guest":
-            return self.queryset.filter(is_active=True)
+            queryset = queryset.filter(is_active=True)
         else:
-            return self.queryset.none()
+            queryset = queryset.none()
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -65,13 +65,25 @@ class ListingViewSet(ModelViewSet):
         return serializer_class
 
     def get_permissions(self):
-        if self.action in ["list"]:
-            permissions = [IsAuthenticated(), CustomModelPermissions()]
-        elif self.action in ['create', 'retrieve', 'update', 'partial_update']:
-            permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-        elif self.action in ['destroy']:
-            permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
-        else:
-            permissions = [IsAuthenticated(), CustomModelPermissions()]
+        permissions = [
+            DistrictAll()
+        ]
+        if self.user_group == "host":
+            if self.action in ["list"]:
+                permissions = [IsAuthenticated(), CustomModelPermissions()]
+                return permissions
+            elif self.action in ['create', 'retrieve', 'update', 'partial_update']:
+                permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
+                return permissions
+            elif self.action in ['destroy']:
+                permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
+                return permissions
+        if self.user_group == "guest":
+
+            if self.action in ["list", "retrieve"]:
+                permissions = [IsAuthenticated(), CustomModelPermissions()]
+                return permissions
         return permissions
+
+
 
