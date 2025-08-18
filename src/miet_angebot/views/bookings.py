@@ -33,9 +33,10 @@ class BookingViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action == "list":
+            print(self.request.user)
             permissions = [IsAuthenticated(), DjangoModelPermissions()]
         elif self.action in ['create', 'update', 'partial_update']:
-            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor]
+            permissions = [IsAuthenticated(), DjangoModelPermissions(), IsAuthor()]
         elif self.action in ['cancel']:
             permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
         elif self.action in ['decline', 'accept']:

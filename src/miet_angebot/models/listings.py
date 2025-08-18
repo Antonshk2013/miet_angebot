@@ -50,5 +50,14 @@ class Listing(models.Model):
         auto_now=True
     )
 
+    @property
+    def short_description(self, len_discr = 12):
+        if len(self.description)>len_discr:
+            return f"{self.description[:len_discr]}..."
+        return self.description[:len_discr+3]
+
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.id} {self.title}"

@@ -14,12 +14,14 @@ class ListingsAdmin(admin.ModelAdmin):
         "cancellation_policy",
         "is_active",
         "author",
+        "created_at"
     )
     list_filter = (
         "is_active",
         "rooms_count",
         "apartment_type",
         "cancellation_policy",
+        "author",
     )
     search_fields = (
         "title",

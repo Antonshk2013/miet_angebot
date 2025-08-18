@@ -7,7 +7,7 @@ from src.commons.choices.booklng_status import BookingStatusChoice
 __all__ = [
     'CountRumsChoice',
     'DeclinedTypeChoice',
-    'CountRumsChoice',
+    'ApartmentTypeChoice',
     'BookingStatusChoice',
 ]
 
