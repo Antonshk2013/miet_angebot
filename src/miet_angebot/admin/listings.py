@@ -14,6 +14,7 @@ class ListingsAdmin(admin.ModelAdmin):
         "cancellation_policy",
         "is_active",
         "author",
+        "created_at"
     )
     list_filter = (
         "is_active",

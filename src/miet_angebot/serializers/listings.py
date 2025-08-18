@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from src.miet_angebot.models import Listing
 
 
@@ -35,14 +34,14 @@ class HostListingSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
-            'description',
-            'location',
             'is_active',
             'price_per_day',
-            'rooms_count',
-            'apartment_type',
-            'cancellation_policy',
         ]
+
+    def to_representation(self, instance):
+        listing = super().to_representation(instance)
+        listing['link'] = f"{self.context.get('request').build_absolute_uri()}{listing['id']}"
+        return listing
 
 class HostRetrieveListingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,6 +61,7 @@ class ListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing
         fields = [
+            'id',
             'title',
             'description',
             'location',
