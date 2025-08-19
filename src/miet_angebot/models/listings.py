@@ -7,10 +7,11 @@ from src.commons.choices import (
     DeclinedTypeChoice,
     ApartmentTypeChoice,
 )
+from src.commons.mixins import ModelCreatedUpdatedMixin
 
 user_model = get_user_model()
 
-class Listing(models.Model):
+class Listing(ModelCreatedUpdatedMixin, models.Model):
     title = models.CharField(
         max_length=100
     )
@@ -42,12 +43,6 @@ class Listing(models.Model):
         user_model,
         on_delete=models.CASCADE,
         related_name='listings'
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True
     )
 
     @property

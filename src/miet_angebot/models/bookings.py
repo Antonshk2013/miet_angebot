@@ -3,10 +3,12 @@ from django.contrib.auth import get_user_model
 
 from src.miet_angebot.models.listings import Listing
 from src.commons.choices import BookingStatusChoice
+from src.commons.mixins import ModelCreatedUpdatedMixin
+
 
 user_model = get_user_model()
 
-class Booking(models.Model):
+class Booking(ModelCreatedUpdatedMixin, models.Model):
     listing = models.ForeignKey(
         Listing,
         on_delete=models.CASCADE,
@@ -18,12 +20,6 @@ class Booking(models.Model):
         user_model,
         on_delete=models.CASCADE,
         related_name='bookings'
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True
     )
     status = models.CharField(
         max_length=100,
