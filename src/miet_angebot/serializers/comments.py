@@ -11,8 +11,6 @@ class CreateCommentSerializer(serializers.ModelSerializer):
         fields = [
             'rating',
             'comment',
-            'user',
-            'listing'
         ]
 
 
@@ -27,5 +25,9 @@ class RetrieveCommentSerializer(serializers.ModelSerializer):
             'user_name',
         ]
 
-    def get_username(self, obj):
-        return obj.user.username
+    def get_user_name(self, obj):
+        return obj.author.username
+
+    #TODO
+    #Сколько угодно может ставить комментарий
+    #Проверяем по дате выезда

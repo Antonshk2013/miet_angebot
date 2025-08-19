@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'src.miet_angebot',
+    'src.miet_angebot.apps.MietAngebotConfig',
     'src.users'
 ]
 

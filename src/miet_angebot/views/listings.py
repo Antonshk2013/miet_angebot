@@ -70,3 +70,4 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
             if self.action in ["list", "retrieve"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
         return permissions
+

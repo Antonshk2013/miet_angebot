@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from src.commons.choices import (
     CountRumsChoice,
@@ -43,6 +43,17 @@ class Listing(ModelCreatedUpdatedMixin, models.Model):
         user_model,
         on_delete=models.CASCADE,
         related_name='listings'
+    )
+
+    rating = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ],
+        null=True,
+
     )
 
     @property

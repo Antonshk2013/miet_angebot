@@ -5,7 +5,8 @@ from django.utils import timezone
 from rest_framework import serializers
 
 from src.miet_angebot.models import Booking
-from src.miet_angebot.serializers.listings import ListingSerializer
+from src.miet_angebot.serializers.comments import RetrieveCommentSerializer
+from src.miet_angebot.serializers.listings import ListingSerializer, GuestRetrieveListingSerializer
 from src.commons.choices import BookingStatusChoice
 
 
@@ -21,7 +22,8 @@ class ListBookingSerializer(serializers.ModelSerializer):
         ]
 
 class RetrieveBookingSerializer(serializers.ModelSerializer):
-    listing = ListingSerializer()
+    listing = GuestRetrieveListingSerializer()
+    comments = RetrieveCommentSerializer(many=True, read_only=True)
     class Meta:
         model = Booking
         fields = [
@@ -30,7 +32,12 @@ class RetrieveBookingSerializer(serializers.ModelSerializer):
             'date_start',
             'date_end',
             'status',
+            'comments',
         ]
+
+    def get_comments(self, obj):
+        comments = obj.comments.all()
+        return comments
 
 class CreateUpdateBookingSerializer(serializers.ModelSerializer):
 
