@@ -1,8 +1,10 @@
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 
 from src.miet_angebot.filters import ListingFilter
 from src.miet_angebot.models import Listing
+from src.miet_angebot.models.counter_listing import CounterListing
 from src.miet_angebot.permissions import (
     IsAuthor,
     CustomModelPermissions,
@@ -25,7 +27,7 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
     http_method_names = ["get", "post", "put", "patch", "delete"]
 
     def get_queryset(self):
-        queryset = Listing.objects.filter()
+        queryset = Listing.objects.all()
         if self.user_group=="host":
             queryset = queryset.filter(author=self.request.user)
         elif self.user_group=="guest":
@@ -70,4 +72,17 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
             if self.action in ["list", "retrieve"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
         return permissions
+
+    def add_counter(self, instance):
+        counter = CounterListing.objects.create(
+            listing=instance,
+            author=self.request.user,
+        )
+        counter.save()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        self.add_counter(instance)
+        return Response(serializer.data)
 

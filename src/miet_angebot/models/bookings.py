@@ -3,12 +3,13 @@ from django.contrib.auth import get_user_model
 
 from src.miet_angebot.models.listings import Listing
 from src.commons.choices import BookingStatusChoice
-from src.commons.mixins import ModelCreatedUpdatedMixin
+from src.commons.base_model import BaseModel
+
 
 
 user_model = get_user_model()
 
-class Booking(ModelCreatedUpdatedMixin, models.Model):
+class Booking(BaseModel):
     listing = models.ForeignKey(
         Listing,
         on_delete=models.CASCADE,
@@ -23,7 +24,7 @@ class Booking(ModelCreatedUpdatedMixin, models.Model):
     )
     status = models.CharField(
         max_length=100,
-        choices=BookingStatusChoice.choices,
+        choices=BookingStatusChoice.choices(),
         null=True,
     )
 

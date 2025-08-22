@@ -7,11 +7,11 @@ from src.commons.choices import (
     DeclinedTypeChoice,
     ApartmentTypeChoice,
 )
-from src.commons.mixins import ModelCreatedUpdatedMixin
+from src.commons.base_model import BaseModel
 
 user_model = get_user_model()
 
-class Listing(ModelCreatedUpdatedMixin, models.Model):
+class Listing(BaseModel):
     title = models.CharField(
         max_length=100
     )
@@ -53,7 +53,12 @@ class Listing(ModelCreatedUpdatedMixin, models.Model):
             MaxValueValidator(5)
         ],
         null=True,
-
+        blank=True
+    )
+    count_comments = models.PositiveIntegerField(
+        default=0,
+        null=True,
+        blank=True
     )
 
     @property

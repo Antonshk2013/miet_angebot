@@ -1,12 +1,11 @@
 from django.db.models import Q
-from django.urls import include
 from django.utils import timezone
 
 from rest_framework import serializers
 
 from src.miet_angebot.models import Booking
 from src.miet_angebot.serializers.comments import RetrieveCommentSerializer
-from src.miet_angebot.serializers.listings import ListingSerializer, GuestRetrieveListingSerializer
+from src.miet_angebot.serializers.listings import GuestRetrieveListingSerializer
 from src.commons.choices import BookingStatusChoice
 
 

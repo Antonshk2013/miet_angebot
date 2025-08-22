@@ -3,16 +3,17 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 from src.miet_angebot.models import Listing, Booking
-from src.commons.mixins import ModelCreatedUpdatedMixin
+from src.commons.base_model import BaseModel
 
 user_model = get_user_model()
 
-class Comment(ModelCreatedUpdatedMixin, models.Model):
+class Comment(BaseModel):
     comment = models.TextField()
     rating = models.PositiveIntegerField(
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)]
+            MinValueValidator(0),
+            MaxValueValidator(5)],
+        default=0
     )
     author = models.ForeignKey(
         user_model,

@@ -14,6 +14,7 @@ class GuestListListingSerializer(serializers.ModelSerializer):
             'rooms_count',
             'apartment_type',
             'rating',
+
         ]
 
 class GuestRetrieveListingSerializer(serializers.ModelSerializer):
@@ -28,6 +29,7 @@ class GuestRetrieveListingSerializer(serializers.ModelSerializer):
             'apartment_type',
             'cancellation_policy',
             'rating',
+            'count_comments'
         ]
 
 class HostListingSerializer(serializers.ModelSerializer):
