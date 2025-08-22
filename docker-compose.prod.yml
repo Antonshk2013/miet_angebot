@@ -1,6 +1,6 @@
 services:
   web:
-    image: your-docker-username/my-app:latest
+    image: antonshk/web:latest
     container_name: django_app
     command: >
       bash -c "
@@ -39,4 +39,4 @@ services:
 
 volumes:
   postgres_data:
-  static_volume:`
+  static_volume:
