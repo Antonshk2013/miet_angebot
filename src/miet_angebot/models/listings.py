@@ -1,16 +1,17 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from src.commons.choices import (
     CountRumsChoice,
     DeclinedTypeChoice,
     ApartmentTypeChoice,
 )
+from src.commons.base_model import BaseModel
 
 user_model = get_user_model()
 
-class Listing(models.Model):
+class Listing(BaseModel):
     title = models.CharField(
         max_length=100
     )
@@ -43,11 +44,21 @@ class Listing(models.Model):
         on_delete=models.CASCADE,
         related_name='listings'
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True
+
+    rating = models.DecimalField(
+        max_digits=2,
+        decimal_places=1,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ],
+        null=True,
+        blank=True
     )
-    updated_at = models.DateTimeField(
-        auto_now=True
+    count_comments = models.PositiveIntegerField(
+        default=0,
+        null=True,
+        blank=True
     )
 
     @property

@@ -11,6 +11,12 @@ from src.miet_angebot.serializers.listings import (
     ListingSerializer,
 )
 
+from src.miet_angebot.serializers.comments import (
+    CreateCommentSerializer,
+    RetrieveCommentSerializer,
+)
+
+
 __all__ = [
     'ListBookingSerializer',
     'RetrieveBookingSerializer',
@@ -20,4 +26,6 @@ __all__ = [
     'HostListingSerializer',
     'HostRetrieveListingSerializer',
     'ListingSerializer',
+    'CreateCommentSerializer',
+    'RetrieveCommentSerializer',
 ]

@@ -1,13 +1,15 @@
+from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from src.miet_angebot.models import Booking
+from src.miet_angebot.models import Booking, Comment
 from src.miet_angebot.serializers import (
     ListBookingSerializer,
     RetrieveBookingSerializer,
-    CreateUpdateBookingSerializer
+    CreateUpdateBookingSerializer, CreateCommentSerializer
 )
 from src.miet_angebot.permissions import (
     IsAuthor,
@@ -44,13 +46,17 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             return RetrieveBookingSerializer
         elif self.action in ['list']:
             return ListBookingSerializer
-        return ListBookingSerializer
+        elif self.action in ['add_comment']:
+            return CreateCommentSerializer
+
 
     def get_permissions(self):
         permissions = [
             DistrictAll()
         ]
-        if self.action == "list":
+        if self.action in ["list", "retrieve"]:
+            print("wir sind da")
+            print(self.request.user)
             permissions = [IsAuthenticated(), CustomModelPermissions()]
         elif self.action in ['create', 'update', 'partial_update']:
             permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
@@ -58,6 +64,8 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             permissions = [IsAuthenticated(), IsAuthor(), CustomActionsPermission()]
         elif self.action in ['decline', 'accept']:
             permissions = [IsAuthenticated(), IsListingAuthor(), CustomActionsPermission()]
+        elif self.action in ['add_comment']:
+            permissions = [IsAuthenticated(), IsAuthor(), CustomModelPermissions()]
         return permissions
 
     @action(url_path="canceled", detail=True, methods=["patch"])
@@ -103,6 +111,29 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({"detail": "Booking accepted successfully."})
+        except Booking.DoesNotExist:
+            return Response({"detail": "Booking does not exist."}, 404)
+        except Exception as e:
+            return Response({"detail": str(e)}, 500)
+
+    @action(detail=True, methods=["post"])
+    def add_comment(self, request, pk=None):
+        try:
+            booking = self.get_object()
+            context = {**self.get_serializer_context(), "booking": booking}
+            serializer = self.get_serializer(
+                data=request.data,
+                context=context
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save(
+                    author=self.request.user,
+                    booking=booking,
+                    listing=booking.listing,
+                )
+            return Response({"detail": "Comment add successfully."})
+        except ValidationError as e:
+            return Response({"detail": e.detail}, 400)
         except Booking.DoesNotExist:
             return Response({"detail": "Booking does not exist."}, 404)
         except Exception as e:
