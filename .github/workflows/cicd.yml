@@ -12,9 +12,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-#      - name: Build Docker image
-#        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
-
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/web:latest .
 
