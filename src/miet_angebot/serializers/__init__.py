@@ -15,6 +15,8 @@ from src.miet_angebot.serializers.comments import (
     CreateCommentSerializer,
     RetrieveCommentSerializer,
 )
+from src.miet_angebot.serializers.search_words import SearchWordsSerializer
+
 
 
 __all__ = [
@@ -28,4 +30,5 @@ __all__ = [
     'ListingSerializer',
     'CreateCommentSerializer',
     'RetrieveCommentSerializer',
+    'SearchWordsSerializer',
 ]
