@@ -18,6 +18,7 @@ from src.miet_angebot.permissions import (
 )
 from src.commons.choices import BookingStatusChoice
 from src.commons.mixins import UserGroupMixin
+from src.miet_angebot.services import BookingService
 
 
 class BookingViewSet(UserGroupMixin, ModelViewSet):
@@ -39,7 +40,7 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             status=BookingStatusChoice.created.value,)
 
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partial_update']:
+        if self.action in ['create', 'update', 'partial_update', 'cancel']:
               return CreateUpdateBookingSerializer
         elif self.action in ['retrieve']:
             return RetrieveBookingSerializer
@@ -69,13 +70,13 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
     def cancel(self, request, pk=None):
         try:
             booking = self.get_object()
-            serializer = self.get_serializer(
-                instance=booking,
-                data={'status': BookingStatusChoice.canceled.value},
-                partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            if not BookingService.is_to_canceled(booking):
+                raise ValidationError("You can not cancelled this booking")
+            booking.status = BookingStatusChoice.canceled.value
+            booking.save()
             return Response({"detail": "Booking cancelled successfully."})
+        except ValidationError as e:
+            return Response({"detail": e.detail},400)
         except Booking.DoesNotExist:
             return Response({"detail": "Booking does not exist."}, 404)
         except Exception as e:
@@ -85,12 +86,8 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
     def decline(self, request, pk=None):
         try:
             booking = self.get_object()
-            serializer = self.get_serializer(
-                instance=booking,
-                data={'status': BookingStatusChoice.declined.value},
-                partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            booking.status = BookingStatusChoice.declined.value
+            booking.save()
             return Response({"detail": "Booking declined successfully."})
         except Booking.DoesNotExist:
             return Response({"detail": "Booking does not exist."}, 404)
@@ -101,12 +98,8 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
     def accept(self, request, pk=None):
         try:
             booking = self.get_object()
-            serializer = self.get_serializer(
-                instance=booking,
-                data={'status': BookingStatusChoice.accepted.value},
-                partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            booking.status = BookingStatusChoice.accepted.value
+            booking.save()
             return Response({"detail": "Booking accepted successfully."})
         except Booking.DoesNotExist:
             return Response({"detail": "Booking does not exist."}, 404)
