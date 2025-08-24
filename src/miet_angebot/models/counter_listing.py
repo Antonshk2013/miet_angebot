@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 from src.commons.base_model import BaseModel
-from src.miet_angebot.models import Listing
+from src.miet_angebot.models.listings import Listing
 
 user_model = get_user_model()
 

@@ -14,6 +14,7 @@ class GuestListListingSerializer(serializers.ModelSerializer):
             'rooms_count',
             'apartment_type',
             'rating',
+            'count_views'
 
         ]
 
@@ -29,7 +30,8 @@ class GuestRetrieveListingSerializer(serializers.ModelSerializer):
             'apartment_type',
             'cancellation_policy',
             'rating',
-            'count_comments'
+            'count_comments',
+            'count_views'
         ]
 
 class HostListingSerializer(serializers.ModelSerializer):
@@ -40,6 +42,7 @@ class HostListingSerializer(serializers.ModelSerializer):
             'title',
             'is_active',
             'price_per_day',
+            'count_views'
         ]
 
     def to_representation(self, instance):
@@ -59,6 +62,7 @@ class HostRetrieveListingSerializer(serializers.ModelSerializer):
             'rooms_count',
             'apartment_type',
             'cancellation_policy',
+            'count_views',
         ]
 
 class ListingSerializer(serializers.ModelSerializer):
@@ -74,4 +78,5 @@ class ListingSerializer(serializers.ModelSerializer):
             'rooms_count',
             'apartment_type',
             'cancellation_policy',
+            'count_views',
         ]

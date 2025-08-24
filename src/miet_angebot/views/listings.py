@@ -1,9 +1,13 @@
+import logging
+
+from django.db.models import Count
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
 from src.miet_angebot.filters import ListingFilter
-from src.miet_angebot.models import Listing
+from src.miet_angebot.models import Listing, SearchWords
 from src.miet_angebot.models.counter_listing import CounterListing
 from src.miet_angebot.permissions import (
     IsAuthor,
@@ -15,17 +19,25 @@ from src.miet_angebot.serializers import (
     GuestRetrieveListingSerializer,
     HostListingSerializer,
     HostRetrieveListingSerializer,
-    ListingSerializer,
+    ListingSerializer, SearchWordsSerializer,
 )
 
 from src.commons.mixins import UserGroupMixin
 
+logger = logging.getLogger(__name__)
 
 class ListingViewSet(UserGroupMixin, ModelViewSet):
     filterset_class = ListingFilter
     search_fields = ["title", "description"]
     ordering_fields = ["price_per_day", "created_at"]
     http_method_names = ["get", "post", "put", "patch", "delete"]
+
+    def perform_search(self, request, query):
+        if request.user.is_authenticated:
+            SearchWords.objects.create(
+                word=query,
+                results_count=self.get_queryset().filter(title__icontains=query).count()
+            )
 
     def get_queryset(self):
         queryset = Listing.objects.all()
@@ -72,6 +84,8 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
         if self.user_group == "guest":
             if self.action in ["list", "retrieve"]:
                 permissions = [IsAuthenticated(), CustomModelPermissions()]
+            if self.action in ['top_search']:
+                permissions = [IsAuthenticated()]
         return permissions
 
     def add_counter(self, instance):
@@ -81,8 +95,30 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
         )
         counter.save()
 
+    def list(self, request, *args, **kwargs):
+        search = request.query_params.get("search")
+        logger.info(
+            f"[ListingViewSet.list] user={request.user} "
+            f"query_params={dict(request.query_params)}"
+        )
+        if self.user_group == "guest" and search:
+            SearchWords.objects.create(
+                word=search,
+            )
+        return super().list(request, *args, **kwargs)
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.add_counter(instance)
+        if self.user_group == "guest":
+            self.add_counter(instance)
         return super().retrieve(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get"])
+    def top_search(self, request, *args, **kwargs):
+        try:
+            results = SearchWords.objects.all()[:10]
+            serializer = SearchWordsSerializer(results, many=True)
+            return Response({"results": serializer.data}, 200)
+        except Exception as e:
+            return Response({"detail": str(e)}, 500)
 
