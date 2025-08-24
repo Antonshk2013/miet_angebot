@@ -18,14 +18,14 @@ services:
     depends_on:
       - db
     env_file:
-      - .env.prod
+      - .env
 
   db:
     image: postgres:latest
     container_name: postgres_db
     restart: always
     env_file:
-      - .env.prod
+      - .env
     ports:
       - "5433:5432"
     volumes:

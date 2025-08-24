@@ -17,6 +17,7 @@ from src.miet_angebot.serializers import (
     HostRetrieveListingSerializer,
     ListingSerializer,
 )
+
 from src.commons.mixins import UserGroupMixin
 
 
@@ -82,7 +83,6 @@ class ListingViewSet(UserGroupMixin, ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         self.add_counter(instance)
-        return Response(serializer.data)
+        return super().retrieve(request, *args, **kwargs)
 
