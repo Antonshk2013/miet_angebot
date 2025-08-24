@@ -1,5 +1,9 @@
 import os
 import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+django.setup()
+
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 
@@ -15,9 +19,6 @@ from src.commons.choices import (
     DeclinedTypeChoice
 )
 from src.miet_angebot.serializers import ListingSerializer
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
-django.setup()
 
 User = get_user_model()
 
