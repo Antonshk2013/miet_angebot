@@ -1,11 +1,10 @@
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from src.miet_angebot.models import Booking, Comment
+from src.miet_angebot.models import Booking
 from src.miet_angebot.serializers import (
     ListBookingSerializer,
     RetrieveBookingSerializer,

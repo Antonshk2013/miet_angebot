@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from src.miet_angebot.models import CounterListing, Listing
+from src.miet_angebot.models import CounterListing
 
 @receiver(post_save, sender=CounterListing)
 def update_count_views(sender, instance, created, **kwargs):

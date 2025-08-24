@@ -1,19 +1,12 @@
 import os
 import django
-from django.test import Client
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
-django.setup()
-
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-
 from django.contrib.auth import get_user_model
+
 from rest_framework.exceptions import ValidationError
 from faker import Faker
 from random import choice, uniform
 from decimal import Decimal
-
 
 from src.miet_angebot.models import Listing
 from src.commons.choices import (
@@ -22,6 +15,9 @@ from src.commons.choices import (
     DeclinedTypeChoice
 )
 from src.miet_angebot.serializers import ListingSerializer
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+django.setup()
 
 User = get_user_model()
 
@@ -36,10 +32,10 @@ else:
     print(f"Superuser {username} already exists")
 
 if not Group.objects.exists():
-    print(f"Creating group host")
+    print("Creating group host")
     group_host = Group.objects.create(name="host")
     group_host.save()
-    print(f"Creating group guest")
+    print("Creating group guest")
     group_host = Group.objects.create(name="guest")
     group_host.save()
 
@@ -54,6 +50,7 @@ def create_user_with_group(group_name):
             password=user_data+user_data)
         user.groups.add(Group.objects.get(name=group_name))
         user.save()
+
 if not User.objects.filter(groups__name="host").exists():
     create_user_with_group("host")
 if not User.objects.filter(groups__name="guest").exists():

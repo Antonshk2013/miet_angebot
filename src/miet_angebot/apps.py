@@ -6,4 +6,4 @@ class MietAngebotConfig(AppConfig):
     name = 'src.miet_angebot'
 
     def ready(self):
-        import src.miet_angebot.signals
+        import src.miet_angebot.signals # noqa: F401

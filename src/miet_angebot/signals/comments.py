@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Avg, Count
 
-from src.miet_angebot.models import Comment, Listing
+from src.miet_angebot.models import Comment
 
 
 @receiver(post_save, sender=Comment)
