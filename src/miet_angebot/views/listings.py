@@ -1,6 +1,7 @@
 import logging
 
 from rest_framework.decorators import action
+from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -27,16 +28,10 @@ logger = logging.getLogger(__name__)
 
 class ListingViewSet(UserGroupMixin, ModelViewSet):
     filterset_class = ListingFilter
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description"]
     ordering_fields = ["price_per_day", "created_at"]
     http_method_names = ["get", "post", "put", "patch", "delete"]
-
-    def perform_search(self, request, query):
-        if request.user.is_authenticated:
-            SearchWords.objects.create(
-                word=query,
-                results_count=self.get_queryset().filter(title__icontains=query).count()
-            )
 
     def get_queryset(self):
         queryset = Listing.objects.all()

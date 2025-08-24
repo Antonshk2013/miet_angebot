@@ -54,8 +54,6 @@ class BookingViewSet(UserGroupMixin, ModelViewSet):
             DistrictAll()
         ]
         if self.action in ["list", "retrieve"]:
-            print("wir sind da")
-            print(self.request.user)
             permissions = [IsAuthenticated(), CustomModelPermissions()]
         elif self.action in ['create', 'update', 'partial_update']:
             permissions = [IsAuthenticated(), CustomModelPermissions(), IsAuthor()]
