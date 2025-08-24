@@ -85,10 +85,11 @@ class CreateUpdateBookingSerializer(serializers.ModelSerializer):
         bookings = Booking.objects.filter(
             listing=listing,
             status__in=include_statuses
-        ).filter(
-            Q(date_start__lte=date_start) & Q(date_end__gte=date_end)
         ).exclude(
             status__in=exclude_statuses
+        ).filter(
+            Q(date_start__lte=date_start, date_end__gte=date_start) |
+            Q(date_start__lte=date_end, date_end__gte=date_end)
         )
         if bookings.exists():
             raise serializers.ValidationError("Listing is already exists.")
